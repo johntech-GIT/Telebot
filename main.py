@@ -6,7 +6,8 @@ from extensions import *
 bot = telebot.TeleBot(TOKEN)
 @bot.message_handler(commands=['start', 'help'])
 def start(message: telebot.types.Message):
-    text ="Приветствие!"
+    text ="чтобы начать работу введите команду боту в следующемформате:\n<имя валюты корою переводим> \ <имя валюты в которую переводим> " \
+          "\ <количество переводимой валюты>\nувидеть список доступных валют: /values"
     bot.send_message(message.chat.id, text)
 
 @bot.message_handler(commands=['values'])
@@ -18,20 +19,21 @@ def start(message: telebot.types.Message):
 
 @bot.message_handler(content_types=['text'])
 def converter(message: telebot.types.Message):
-        try:
-            base, quote, amount = message.text.split()
-        except ValueError as e:
-            bot.reply_to(message, 'неверное количество параметров!')
-        try:
-            new_price = Converter.get_price(base, quote, amount,)
-        except ApiException as e:
-            bot.reply_to(message, f'ошибка в команде:\n{e}')
+    print(len(message.text.split()))
+    try:
+        values = message.text.split()
 
-        base, quote, amount = message.text.split()
-        new_price = Converter.get_price(base, quote, amount, )
-        bot.reply_to(message, f"цена {amount} {base} в {quote} : {new_price}")
+        if len(values) != 3:
+            raise ApiException('неверное количество параметров!')
 
-
+        quote, base, amount = values
+        new_price = Converter.get_price(quote, base, amount, )
+    except ApiException as e:
+        bot.reply_to(message, f'ошибка в команде:\n{e}')
+    except Exception as e:
+        bot.reply_to(message, f'не удалось обработать команду:\n{e}')
+    else:
+        bot.reply_to(message, f"цена {amount} {quote} в {base} : {new_price}")
 
 
 
