@@ -19,23 +19,18 @@ def start(message: telebot.types.Message):
 
 @bot.message_handler(content_types=['text'])
 def converter(message: telebot.types.Message):
-    print(len(message.text.split()))
     try:
         values = message.text.split()
-
         if len(values) != 3:
             raise ApiException('неверное количество параметров!')
-
         quote, base, amount = values
         new_price = Converter.get_price(quote, base, amount, )
     except ApiException as e:
-        bot.reply_to(message, f'ошибка в команде:\n{e}')
+        bot.reply_to(message, f'Ошибка в команде:\n{e}')
     except Exception as e:
-        bot.reply_to(message, f'не удалось обработать команду:\n{e}')
+        bot.reply_to(message, f'Ошибка:\nОтсутствует связь с поставщиком данных')
     else:
         bot.reply_to(message, f"цена {amount} {quote} в {base} : {new_price}")
-
-
 
 
 bot.polling(none_stop=True)
